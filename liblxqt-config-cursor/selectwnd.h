@@ -16,7 +16,7 @@
 #include <QObject>
 #include <QWidget>
 
-namespace LxQt {
+namespace LXQt {
   class Settings;
 }
 
@@ -28,7 +28,7 @@ class SelectWnd : public QWidget, private Ui_SelectWnd
     Q_OBJECT
 
 public:
-    SelectWnd (LxQt::Settings* settings, QWidget *parent=0);
+    SelectWnd (LXQt::Settings* settings, QWidget *parent=0);
     ~SelectWnd ();
 
 public slots:
@@ -53,7 +53,7 @@ private slots:
 private:
     XCursorThemeModel *mModel;
     QPersistentModelIndex mAppliedIndex;
-    LxQt::Settings* mSettings;
+    LXQt::Settings* mSettings;
 };
 
 #endif
