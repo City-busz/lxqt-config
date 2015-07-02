@@ -102,28 +102,29 @@ void MonitorSettingsDialog::applyConfiguration()
 {
     if (mConfig && KScreen::Config::canBeApplied(mConfig))
     {
-        // FIXME: This is a hack to set right framebuffer size 
-        QSize currentScreenSize = screenSize(mOldConfig);
-        QSize newScreenSize = screenSize(mConfig);
-        if(screenArea(currentScreenSize) > screenArea(newScreenSize))
-            KScreen::SetConfigOperation(mConfig).exec();
-        else
-        {
-            // Clone config and change position of outputs in order to force set framebuffer size
-            KScreen::ConfigPtr cloneConfig = mConfig->clone();
-            for (const KScreen::OutputPtr &output : cloneConfig->outputs())
-            {
-                 if(output->isEnabled())
-                 {
-                     QPoint pos = output->pos();
-                     output->setPos(QPoint(pos.x()+10, pos.y()+10));
-                     KScreen::SetConfigOperation(cloneConfig).exec();
-                     // Apply right settings
-                     KScreen::SetConfigOperation(mConfig).exec();
-                     break;
-                 }
-            }
-        }
+        KScreen::SetConfigOperation(mConfig).exec();
+       // // FIXME: This is a hack to set right framebuffer size 
+       // QSize currentScreenSize = screenSize(mOldConfig);
+       // QSize newScreenSize = screenSize(mConfig);
+       // if(screenArea(currentScreenSize) > screenArea(newScreenSize))
+       //     KScreen::SetConfigOperation(mConfig).exec();
+       // else
+       // {
+       //     // Clone config and change position of outputs in order to force set framebuffer size
+       //     KScreen::ConfigPtr cloneConfig = mConfig->clone();
+       //     for (const KScreen::OutputPtr &output : cloneConfig->outputs())
+       //     {
+       //          if(output->isEnabled())
+       //          {
+       //              QPoint pos = output->pos();
+       //              output->setPos(QPoint(pos.x()+10, pos.y()+10));
+       //              KScreen::SetConfigOperation(cloneConfig).exec();
+       //              // Apply right settings
+       //              KScreen::SetConfigOperation(mConfig).exec();
+       //              break;
+       //          }
+       //     }
+       // }
 
         TimeoutDialog mTimeoutDialog;
         if (mTimeoutDialog.exec() == QDialog::Rejected)
