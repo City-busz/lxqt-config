@@ -73,27 +73,27 @@ void MonitorSettingsDialog::loadConfiguration(KScreen::ConfigPtr config)
 }
 
 
-static QSize screenSize(const KScreen::ConfigPtr &config) 
-{
-    QRect rect;
-    Q_FOREACH(const KScreen::OutputPtr &output, config->outputs()) {
-        if (!output->isConnected() || !output->isEnabled())
-            continue;
-
-        const KScreen::ModePtr currentMode = output->currentMode();
-        const QRect outputGeom = output->geometry();
-        rect = rect.united(outputGeom);
-    }
-
-    const QSize size = QSize(rect.width(), rect.height());
-    return size;
-}
-
-
-static int screenArea(QSize screenSize)
-{
-    return screenSize.width()*screenSize.height();
-}
+// static QSize screenSize(const KScreen::ConfigPtr &config) 
+// {
+//     QRect rect;
+//     Q_FOREACH(const KScreen::OutputPtr &output, config->outputs()) {
+//         if (!output->isConnected() || !output->isEnabled())
+//             continue;
+// 
+//         const KScreen::ModePtr currentMode = output->currentMode();
+//         const QRect outputGeom = output->geometry();
+//         rect = rect.united(outputGeom);
+//     }
+// 
+//     const QSize size = QSize(rect.width(), rect.height());
+//     return size;
+// }
+// 
+// 
+// static int screenArea(QSize screenSize)
+// {
+//     return screenSize.width()*screenSize.height();
+// }
 
 /**
  * Apply the settings
