@@ -57,13 +57,29 @@ public:
     MonitorWidget *monitorWidget;
     int originX, originY;
 
+    void updateSize(QString text);
+
 private:
     QGraphicsTextItem *textItem;
     MonitorPictureDialog *monitorPictureDialog;
+
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant & value);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
 };
+
+class MonitorPictureProxy: public QObject
+{
+    Q_OBJECT
+    public:
+        MonitorPictureProxy(QObject *parent, MonitorPicture *monitorPicture);
+        MonitorPicture *monitorPicture;
+        
+    public slots:
+        void updateSize(QString size);
+        
+};
+
 
 #endif // _MONITORPICTURE_H_

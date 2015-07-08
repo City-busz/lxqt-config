@@ -21,6 +21,7 @@
 
 #include "monitorwidget.h"
 #include "timeoutdialog.h"
+#include "monitorpicture.h"
 
 #include <KScreen/Output>
 
@@ -57,6 +58,12 @@ void MonitorSettingsDialog::loadConfiguration(KScreen::ConfigPtr config)
 
     mConfig = config;
 
+    MonitorPictureDialog *monitorPicture = new MonitorPictureDialog(this);
+    ui.monitorList->addItem(tr("Set position"));
+    ui.stackedWidget->addWidget(monitorPicture);
+
+    QList<MonitorWidget*> monitors;
+
     KScreen::OutputList outputs = mConfig->outputs();
     for (const KScreen::OutputPtr &output : outputs)
     {
@@ -65,8 +72,11 @@ void MonitorSettingsDialog::loadConfiguration(KScreen::ConfigPtr config)
             MonitorWidget *monitor = new MonitorWidget(output, mConfig, this);
             ui.monitorList->addItem(output->name());
             ui.stackedWidget->addWidget(monitor);
+            monitors.append(monitor);
         }
     }
+
+    monitorPicture->setScene(monitors);
 
     ui.monitorList->setCurrentRow(0);
     adjustSize();

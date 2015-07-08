@@ -24,6 +24,16 @@
 #include <QDebug>
 #include <QVector2D>
 
+MonitorPictureProxy::MonitorPictureProxy(QObject *parent, MonitorPicture *monitorPicture):QObject(parent)
+{
+    this->monitorPicture = monitorPicture;
+}
+
+void MonitorPictureProxy::updateSize(QString size)
+{
+    monitorPicture->updateSize(size);
+}
+
 MonitorPictureDialog::MonitorPictureDialog(QWidget * parent, Qt::WindowFlags f) :
     QDialog(parent,f)
 {
@@ -42,8 +52,12 @@ void MonitorPictureDialog::setScene(QList<MonitorWidget *> monitors)
         scene->addItem(monitorPicture);
         monitorsWidth += monitorPicture->rect().width();
         monitorsHeight += monitorPicture->rect().height();
+        MonitorPictureProxy *proxy = new MonitorPictureProxy(this, monitorPicture);
+        proxy->connect(monitor->ui.resolutionCombo, SIGNAL(currentTextChanged(QString)), SLOT(updateSize(QString)));
     }
-    ui.graphicsView->scale(200.0 / (float) monitorsWidth, 200.0 / (float) monitorsHeight);
+    int minWidgetLength = qMin(ui.graphicsView->size().width(), ui.graphicsView->size().width()) / 1.5;
+    int maxMonitorSize = qMax(monitorsWidth, monitorsHeight);
+    ui.graphicsView->scale(minWidgetLength / (float) maxMonitorSize, minWidgetLength / (float) maxMonitorSize);
     ui.graphicsView->setScene(scene);
 }
 
@@ -62,18 +76,28 @@ void MonitorPictureDialog::updateMonitorWidgets(QString primaryMonitor)
         if (picture->monitorWidget->output->name() == primaryMonitor
             || primaryMonitor == QStringLiteral(""))
         {
-            x0 = picture->monitorWidget->ui.xPosSpinBox->value() + picture->pos().x();
-            y0 = picture->monitorWidget->ui.yPosSpinBox->value() + picture->pos().y();
+            x0 = picture->originX + picture->pos().x();
+            y0 = picture->originY + picture->pos().y();
             break;
+        }
+    }
+
+    if( primaryMonitor == QStringLiteral("") )
+    {
+        for(MonitorPicture *picture: pictures)
+        {
+            int x1 = picture->originX + picture->pos().x();
+            int y1 = picture->originY + picture->pos().y();
+            x0 = qMin(x0, x1);
+            y0 = qMin(y0, y1);
         }
     }
 
     for (MonitorPicture *picture : pictures)
     {
-        int x = -x0 + picture->monitorWidget->ui.xPosSpinBox->value();
-        int y = -y0 + picture->monitorWidget->ui.yPosSpinBox->value();
-        picture->monitorWidget->ui.xPosSpinBox->setValue(x + picture->pos().x());
-        picture->monitorWidget->ui.yPosSpinBox->setValue(y + picture->pos().y());
+        picture->monitorWidget->ui.xPosSpinBox->setValue(picture->originX + picture->pos().x() - x0);
+        picture->monitorWidget->ui.yPosSpinBox->setValue(picture->originY + picture->pos().y() - y0);
+        // qDebug() << "[MonitorPictureDialog::updateMonitorWidgets]" << picture->originX + picture->pos().x() << ',' << picture->originY + picture->pos().y();
     }
 }
 
@@ -107,15 +131,26 @@ void MonitorPicture::adjustNameSize()
     textItem->setScale((qreal) this->rect().width() / fontWidth);
 }
 
+void MonitorPicture::updateSize(QString text)
+{
+    QSize currentSize = sizeFromString(text);
+    QRectF r = rect();
+    r.setSize(currentSize);
+    setRect(r);
+    adjustNameSize();
+}
+
 QVariant MonitorPicture::itemChange(GraphicsItemChange change, const QVariant & value)
 {
-  //qDebug() << "[MonitorPicture::itemChange]: ";
-  //if ( change == ItemPositionChange && scene()) {
-        // value is the new position.
-        //QPointF newPos = value.toPointF();
-        //qDebug() << "[MonitorPictureDialog::updateMonitorWidgets]: " << newPos.x() << "x" << newPos.y();
-  //}
-    return QGraphicsItem::itemChange(change, value);
+    //qDebug() << "[MonitorPicture::itemChange]: ";
+    //if ( change == ItemPositionChange && scene()) {
+          // value is the new position.
+          //QPointF newPos = value.toPointF();
+          //qDebug() << "[MonitorPictureDialog::updateMonitorWidgets]: " << newPos.x() << "x" << newPos.y();
+    //}
+    QVariant v = QGraphicsItem::itemChange(change, value);
+    monitorPictureDialog->updateMonitorWidgets(QString());
+    return v;
 }
 
 void MonitorPicture::setMonitorPosition(int x, int y)
