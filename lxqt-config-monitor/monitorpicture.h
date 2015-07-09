@@ -43,6 +43,7 @@ public:
 private:
     Ui::MonitorPictureDialog ui;
     QList<MonitorPicture*> pictures;
+    bool updatingOk;
 };
 
 class MonitorPicture : public QGraphicsRectItem
@@ -57,7 +58,7 @@ public:
     MonitorWidget *monitorWidget;
     int originX, originY;
 
-    void updateSize(QString text);
+    void updateSize(QSize size);
 
 private:
     QGraphicsTextItem *textItem;
@@ -77,7 +78,8 @@ class MonitorPictureProxy: public QObject
         MonitorPicture *monitorPicture;
         
     public slots:
-        void updateSize(QString size);
+        void updateSize();
+        void updatePosition();
         
 };
 
