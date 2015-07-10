@@ -176,7 +176,7 @@ QVariant MonitorPicture::itemChange(GraphicsItemChange change, const QVariant & 
           //qDebug() << "[MonitorPictureDialog::updateMonitorWidgets]: " << newPos.x() << "x" << newPos.y();
     //}
     QVariant v = QGraphicsItem::itemChange(change, value);
-    monitorPictureDialog->updateMonitorWidgets(QString());
+    //monitorPictureDialog->updateMonitorWidgets(QString());
     return v;
 }
 
@@ -190,6 +190,7 @@ void MonitorPicture::mouseReleaseEvent(QGraphicsSceneMouseEvent * event)
 {
     QGraphicsRectItem::mouseReleaseEvent(event);
     monitorPictureDialog->moveMonitorPictureToNearest(this);
+    monitorPictureDialog->updateMonitorWidgets(QString());
 }
 
 //////////////////////////////////////////////////////////////////////////////////
