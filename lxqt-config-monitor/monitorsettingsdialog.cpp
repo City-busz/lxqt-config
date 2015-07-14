@@ -57,12 +57,18 @@ void MonitorSettingsDialog::loadConfiguration(KScreen::ConfigPtr config)
         return;
 
     mConfig = config;
+    MonitorPictureDialog *monitorPicture = nullptr;
 
     KScreen::OutputList outputs = mConfig->outputs();
 
-    MonitorPictureDialog *monitorPicture = nullptr;
+    int nMonitors = 0;
+    for (const KScreen::OutputPtr &output : outputs)
+    {
+        if (output->isConnected())
+            nMonitors++;
+    }
 
-    if( outputs.count() > 1 )
+    if( nMonitors > 1 )
     {
         monitorPicture = new MonitorPictureDialog(config, this);
         ui.monitorList->addItem(tr("Set position"));
