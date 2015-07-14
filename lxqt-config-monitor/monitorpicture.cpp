@@ -44,17 +44,19 @@ void MonitorPictureProxy::updatePosition()
     monitorPicture->setMonitorPosition(pos.x(), pos.y());
 }
 
-MonitorPictureDialog::MonitorPictureDialog(QWidget * parent, Qt::WindowFlags f) :
+MonitorPictureDialog::MonitorPictureDialog(KScreen::ConfigPtr config, QWidget * parent, Qt::WindowFlags f) :
     QDialog(parent,f)
 {
     updatingOk = false;
+    mConfig = config;
     ui.setupUi(this);
 }
 
+
 void MonitorPictureDialog::setScene(QList<MonitorWidget *> monitors)
 {
-    int monitorsWidth = 100.0;
-    int monitorsHeight = 100.0;
+    int monitorsWidth =0;
+    int monitorsHeight = 0;
     QGraphicsScene *scene = new QGraphicsScene();
     for (MonitorWidget *monitor : monitors)
     {
@@ -67,6 +69,8 @@ void MonitorPictureDialog::setScene(QList<MonitorWidget *> monitors)
         proxy->connect(monitor->output.data(), SIGNAL(currentModeIdChanged()), SLOT(updateSize()));
         proxy->connect(monitor->output.data(), SIGNAL(posChanged()), SLOT(updatePosition()));
     }
+    // The blue rectangle is maximum size of virtual screen (framebuffer)
+    scene->addRect(0, 0, mConfig->screen()->maxSize().width(), mConfig->screen()->maxSize().height(), QPen(Qt::blue, 20))->setOpacity(0.5);
     int minWidgetLength = qMin(ui.graphicsView->size().width(), ui.graphicsView->size().width()) / 1.5;
     int maxMonitorSize = qMax(monitorsWidth, monitorsHeight);
     ui.graphicsView->scale(minWidgetLength / (float) maxMonitorSize, minWidgetLength / (float) maxMonitorSize);

@@ -58,13 +58,19 @@ void MonitorSettingsDialog::loadConfiguration(KScreen::ConfigPtr config)
 
     mConfig = config;
 
-    MonitorPictureDialog *monitorPicture = new MonitorPictureDialog(this);
-    ui.monitorList->addItem(tr("Set position"));
-    ui.stackedWidget->addWidget(monitorPicture);
+    KScreen::OutputList outputs = mConfig->outputs();
+
+    MonitorPictureDialog *monitorPicture = nullptr;
+
+    if( outputs.count() > 1 )
+    {
+        monitorPicture = new MonitorPictureDialog(config, this);
+        ui.monitorList->addItem(tr("Set position"));
+        ui.stackedWidget->addWidget(monitorPicture);
+    }
 
     QList<MonitorWidget*> monitors;
 
-    KScreen::OutputList outputs = mConfig->outputs();
     for (const KScreen::OutputPtr &output : outputs)
     {
         if (output->isConnected())
@@ -76,7 +82,8 @@ void MonitorSettingsDialog::loadConfiguration(KScreen::ConfigPtr config)
         }
     }
 
-    monitorPicture->setScene(monitors);
+    if( monitorPicture != nullptr )
+        monitorPicture->setScene(monitors);
 
     ui.monitorList->setCurrentRow(0);
     adjustSize();

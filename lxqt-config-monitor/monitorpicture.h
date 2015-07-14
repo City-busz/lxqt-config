@@ -34,7 +34,7 @@ class MonitorPictureDialog : public QDialog
     Q_OBJECT
 
 public:
-    MonitorPictureDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
+    MonitorPictureDialog(KScreen::ConfigPtr config, QWidget * parent = 0, Qt::WindowFlags f = 0);
     void setScene(QList<MonitorWidget*> monitors);
     void updateMonitorWidgets(QString primaryMonitor);
     void moveMonitorPictureToNearest(MonitorPicture* monitorPicture);
@@ -44,6 +44,7 @@ private:
     Ui::MonitorPictureDialog ui;
     QList<MonitorPicture*> pictures;
     bool updatingOk;
+    KScreen::ConfigPtr mConfig; 
 };
 
 class MonitorPicture : public QGraphicsRectItem
