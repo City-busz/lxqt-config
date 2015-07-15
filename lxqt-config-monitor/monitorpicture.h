@@ -22,6 +22,8 @@
 #include <QGraphicsView>
 #include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
+#include <QSvgRenderer>
+#include <QGraphicsSvgItem>
 #include <QDialog>
 #include "monitor.h"
 #include "ui_monitorpicture.h"
@@ -63,6 +65,7 @@ public:
 
 private:
     QGraphicsTextItem *textItem;
+    QGraphicsSvgItem *svgItem;    
     MonitorPictureDialog *monitorPictureDialog;
 
 

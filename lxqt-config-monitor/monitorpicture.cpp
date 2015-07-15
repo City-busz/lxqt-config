@@ -23,6 +23,7 @@
 #include <QPen>
 #include <QDebug>
 #include <QVector2D>
+#include "configure.h"
 
 MonitorPictureProxy::MonitorPictureProxy(QObject *parent, MonitorPicture *monitorPicture):QObject(parent)
 {
@@ -145,22 +146,47 @@ MonitorPicture::MonitorPicture(QGraphicsItem * parent,
     int y = monitorWidget->ui.yPosSpinBox->value();
     setAcceptedMouseButtons(Qt::LeftButton);
     setFlags(QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemSendsGeometryChanges);
-    setRect(x, y, currentSize.width(), currentSize.height());
     originX = x;
     originY = y;
-    setPen(QPen(Qt::black, 20));
+    
+    setRect(x, y, currentSize.width(), currentSize.height());
+    // setPen(QPen(Qt::black, 20));
+    // textItem = new QGraphicsTextItem(monitorWidget->output->name(), this);
+    // textItem->setX(x);
+    // textItem->setY(y);
+    // textItem->setParentItem(this);
+
+    QSvgRenderer *renderer = new QSvgRenderer(QLatin1String(ICON_PATH "monitor.svg"));
+    svgItem = new QGraphicsSvgItem();
+    svgItem->setSharedRenderer(renderer);
+    svgItem->setX(x);
+    svgItem->setY(y);
+    svgItem->setOpacity(0.7);
+    svgItem->setParentItem(this);
+  
+  
     textItem = new QGraphicsTextItem(monitorWidget->output->name(), this);
+    textItem->setDefaultTextColor(Qt::white);
     textItem->setX(x);
     textItem->setY(y);
     textItem->setParentItem(this);
+    setPen(QPen(Qt::black, 20));
+    
 
     adjustNameSize();
 }
 
 void MonitorPicture::adjustNameSize()
 {
+    prepareGeometryChange();
     qreal fontWidth = QFontMetrics(textItem->font()).width(monitorWidget->output->name() + QStringLiteral("  "));
     textItem->setScale((qreal) this->rect().width() / fontWidth);
+    QTransform transform;
+    qreal width = qAbs(this->rect().width()/svgItem->boundingRect().width());
+    qreal height = qAbs(this->rect().height()/svgItem->boundingRect().height());
+    qDebug() << "Width x Height" << width << "x" << height;
+    transform.scale(width, height);
+    svgItem->setTransform(transform);
 }
 
 void MonitorPicture::updateSize(QSize currentSize)
