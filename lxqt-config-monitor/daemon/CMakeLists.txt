@@ -1,6 +1,4 @@
-project(lxqt-config-monitor)
-
-add_subdirectory(daemon)
+project(lxqt-config-monitor-daemon)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
@@ -10,37 +8,18 @@ include_directories (
 )
 
 find_package(KF5Screen REQUIRED)
-find_package(Qt5Svg REQUIRED)
+find_package(Qt5Core REQUIRED)
 
 set(H_FILES
-    monitorsettingsdialog.h
-    monitor.h
-    monitorwidget.h
-    monitorpicture.h
+    screen_listener.h
 )
 
 set(CPP_FILES
+    screen_listener.cpp
     main.cpp
-    monitorsettingsdialog.cpp
-    monitor.cpp
-    monitorwidget.cpp
-    timeoutdialog.cpp
-    monitorpicture.cpp
 )
 
-set(UI_FILES
-    monitorsettingsdialog.ui
-    monitorwidget.ui
-    timeoutdialog.ui
-    monitorpicture.ui
-)
 
-set(ICON_FILES
-	icons/monitor.svg
-)
-
-# Config file
-configure_file ( configure.in configure.h )
 
 qt5_wrap_ui(UI_HEADERS ${UI_FILES})
 
@@ -57,7 +36,6 @@ lxqt_translate_ts(QM_FILES
 )
 
 lxqt_app_translation_loader(QM_LOADER ${PROJECT_NAME})
-lxqt_translate_desktop(DESKTOP_FILES SOURCES ${PROJECT_NAME}.desktop.in)
 
 #************************************************
 
@@ -73,13 +51,8 @@ add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    Qt5::Widgets
-    Qt5::X11Extras
-    Qt5::Svg
     KF5::Screen
     ${LXQT_LIBRARIES}
 )
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
-install(FILES ${DESKTOP_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/share/applications")
-install(FILES ${ICON_FILES} DESTINATION "${CMAKE_INSTALL_PREFIX}/share/lxqt/icons/")
