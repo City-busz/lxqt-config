@@ -34,6 +34,8 @@ void MonitorPictureProxy::updateSize()
 {
     KScreen::OutputPtr output = monitorPicture->monitorWidget->output;
     QSize size = output->currentMode()->size();
+    if( output->rotation() == KScreen::Output::Left || output->rotation() == KScreen::Output::Right )
+        size.transpose();
     monitorPicture->updateSize(size);
 }
 
@@ -67,6 +69,7 @@ void MonitorPictureDialog::setScene(QList<MonitorWidget *> monitors)
         monitorsWidth += monitorPicture->rect().width();
         monitorsHeight += monitorPicture->rect().height();
         MonitorPictureProxy *proxy = new MonitorPictureProxy(this, monitorPicture);
+        proxy->connect(monitor->output.data(), SIGNAL(rotationChanged()), SLOT(updateSize()));
         proxy->connect(monitor->output.data(), SIGNAL(currentModeIdChanged()), SLOT(updateSize()));
         proxy->connect(monitor->output.data(), SIGNAL(posChanged()), SLOT(updatePosition()));
     }
@@ -142,6 +145,8 @@ MonitorPicture::MonitorPicture(QGraphicsItem * parent,
     this->monitorWidget = monitorWidget;
     this->monitorPictureDialog = monitorPictureDialog;
     QSize currentSize = sizeFromString(monitorWidget->ui.resolutionCombo->currentText());
+    if( monitorWidget->output->rotation() == KScreen::Output::Left || monitorWidget->output->rotation() == KScreen::Output::Right )
+        currentSize.transpose();
     int x = monitorWidget->ui.xPosSpinBox->value();
     int y = monitorWidget->ui.yPosSpinBox->value();
     setAcceptedMouseButtons(Qt::LeftButton);
@@ -184,7 +189,6 @@ void MonitorPicture::adjustNameSize()
     QTransform transform;
     qreal width = qAbs(this->rect().width()/svgItem->boundingRect().width());
     qreal height = qAbs(this->rect().height()/svgItem->boundingRect().height());
-    qDebug() << "Width x Height" << width << "x" << height;
     transform.scale(width, height);
     svgItem->setTransform(transform);
 }
